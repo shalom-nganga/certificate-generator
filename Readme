@@ -1,0 +1,19 @@
+# SQA Festival 2026 — Certificate Generator (email-gated)
+
+## Files
+- `login.php` — the entry point. Visitors type their email; it's checked against `attendees.csv`.
+- `certificate.php` — your certificate generator, now gated. Anyone without a verified session is bounced back to `login.php`. The recipient name field is pre-filled from the attendee list.
+- `logout.php` — clears the session.
+- `attendees.csv` — the list emails are checked against. **Replace the sample rows with your real registration export** (email, name).
+
+## Deploying
+1. Needs a real PHP server (Apache/Nginx + PHP, or `php -S localhost:8000` locally to test) — this won't work on static hosting like GitHub Pages.
+2. Upload all four files to the same folder on your host, e.g. `sqasummit2026.kiwamitech.com/certificate/`.
+3. Replace `attendees.csv` with your actual list. Keep the header row (`email,name`) and one attendee per line. Emails are matched case-insensitively.
+4. Send attendees the link to `login.php` (not `certificate.php` directly — they'll just get redirected to log in anyway).
+
+## Updating the attendee list
+Just re-upload `attendees.csv` whenever your registration list changes — no code changes needed. If you'd rather pull from a database (e.g. your event registration system) instead of a CSV, the `loadAttendees()` function in `login.php` is the only place that needs to change — swap the CSV read for a database query that returns the same `[email => name]` shape.
+
+## A note on how strong this gate is
+This checks *that an email is on the list*, not that the person typing it owns that inbox — there's no password or emailed link to click, since you mentioned wanting to keep it simple with plain HTML + PHP. That's fine for keeping out randoms who stumble on the URL, but someone who knows or guesses an attendee's email could get in under that name. If you want real verification later, the next step up is emailing each attendee a unique one-time link (a random token stored next to their email) instead of accepting any typed email — happy to build that version if you want it.
